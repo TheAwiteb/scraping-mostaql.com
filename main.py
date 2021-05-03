@@ -9,9 +9,9 @@ chat_id = int() # your id
 
 # 'business','development','engineering-architecture','design','marketing','writing-translation','support','training'
 category_lst = [] # Put the fields that you want to search (you can place more than one field)
+keywords = [] # your key words
 category = '' if len(category_lst) == 0 else ','.join(category_lst)
 search_url = "https://mostaql.com/projects?keyword={}&category="+category
-keywords = [] # your key words
 send = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}&parse_mode=markdown"
 
 def get_text(text:str):
@@ -37,15 +37,14 @@ def main():
                 title = title_and_url.find('a').text.strip()
                 project_url = title_and_url.find('a').get('href')
                 project_id = project_url.replace('https://sa.mostaql.com/project/', '').split('-')[0]
-                print(project_id)
                 time_ago = project.find('li', class_="text-muted").text.strip()
                 date = project.find('li', class_="text-muted").find('time').get('title')
                 detalils = project.find('a', class_="details-url").text.strip()
-                if get_text(time_ago) in ['دقيقة', 'دقيقتين', 'ساعات', 'دقائق', 'ساعتين'] and project_id not in projects_id:
+                if get_text(time_ago) in ['دقيقة', 'دقيقتين', 'ساعات', 'دقائق', 'ساعتين', 'ساعتي'] and project_id not in projects_id:
                     text = f"[رابط العرض]({project_url})\nالعنوان: {title}\nالوصف: {detalils}\n\n التاريخ: {date}\n{time_ago}"
                     requests.post(send.format(TOKEN,chat_id,text))
                     with open('projects_id.txt', 'a') as f:
-                        f.write(project_url+'\n')
+                        f.write('\n'+project_id)
         sleep(10*60)
 if __name__ == "__main__":
     main()
